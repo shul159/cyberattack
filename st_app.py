@@ -8,6 +8,7 @@ import streamlit as st
 from  helper import data_type
 import matplotlib.pyplot as plt
 import seaborn as sns
+from openai import OpenAI
 
 trained_model = dill.load(open(r'C:/Users/liush/Downloads/rf_model.dill', 'rb'))
 
@@ -23,7 +24,8 @@ def main():
     ## display the front end aspect
     st.markdown(html_temp,unsafe_allow_html=True)
     
-    st.write('This is a simple app to show the results of the predictive maintenance model.')
+    with st.chat_message("assistant"):
+        st.write('Hello Human👋, I am a Cyberattack Detector developed by the LYL team.')
     
     file = st.file_uploader("Upload file", type=["csv"])
     if file is not None:
@@ -33,12 +35,16 @@ def main():
             X = pd.read_csv(file, low_memory=False, dtype=data_type)
             st.subheader('Data')
             st.write(X.head())
+            with st.chat_message("assistant"):
+                st.write('Let us take a look of the data')
         except Exception as e:
             st.write(str(e))
 
     st.subheader('EDA')
-    if st.button('Analyze data'): 
-        st.write('Correlations of numerical features')
+        
+    if st.button('Analyze data'):
+        with st.chat_message("assistant"):
+            st.write('Correlations of numerical features')
         # selected_numerical_features = ['icmp.seq_le', 'icmp.checksum', 'http.content_length', 'tcp.connection.rst', 'tcp.ack', 'mqtt.topic_len']
         # correlation_matrix = X[selected_numerical_features].corr()
         numerical_features = ['icmp.checksum', 'icmp.seq_le', 'tcp.ack', 'tcp.ack_raw', 
@@ -55,7 +61,8 @@ def main():
         st.pyplot(fig)
         plt.clf()
         
-        st.write('Counts of categorical features')
+        with st.chat_message("assistant"):
+            st.write('Counts of categorical features')
         # selected_categorical_features = ['mqtt.protoname', 'http.response', 'http.request.method', 'mqtt.conack.flags']
         categorical_features = ['http.request.method', 'http.referer', 'http.response', 'mqtt.conack.flags', 'mqtt.protoname',
                                 'mqtt.topic', 'http.request.version', 'dns.qry.name.len']
@@ -68,10 +75,12 @@ def main():
     st.subheader('Prediction') 
     if st.button('Predict'):
         try:
-            st.write('Start predicting')
+            with st.chat_message("assistant"): 
+                st.write('Start predicting')
             predictions = trained_model.predict(X)
             
-            st.write('Normal vs. Attack')
+            with st.chat_message("assistant"): 
+                st.write('Normal vs. Attack')
             normal_count = (predictions == 'Normal').sum()
             attack_count = len(predictions) - normal_count
             ax = pd.DataFrame({'Normal': [normal_count], 'Attack': [attack_count]}).plot(kind='bar')
@@ -79,17 +88,23 @@ def main():
             st.pyplot(fig)
             plt.clf()
             
-            st.write('Attack Types')
+            
+            with st.chat_message("assistant"): 
+                st.write('Attack Types')
             ax2 = pd.DataFrame({'Attack_type':predictions}).Attack_type.value_counts().sort_values(ascending=True).plot(kind='barh')
             fig2 = ax2.figure
             st.pyplot(fig2)
             plt.clf()
             
+                        
             if attack_count == 0:
-                st.write('Great! Your network is safe!')
+                with st.chat_message("assistant"):
+                    st.write('Great! Your network is safe!')
             else:
-                st.write('Danger! Your network is under attack!')
-                st.write('Here is something you can do')
+                with st.chat_message("assistant"):
+                    st.write('Danger! Your network is under cyberattack!')
+                                    
+                st.write('Here is somethings you can do. You can also ask me for help!')
                 st.markdown(f"[{'Cyberattack'}]({'https://en.wikipedia.org/wiki/Cyberattackt'})", unsafe_allow_html=True)
                 st.markdown(f"[{'Denial-of-service attack'}]({'https://en.wikipedia.org/wiki/Denial-of-service_attack'})", unsafe_allow_html=True)
                 st.markdown(f"[{'Man-in-the-middle attack'}]({'https://en.wikipedia.org/wiki/Man-in-the-middle_attack'})", unsafe_allow_html=True)
@@ -104,6 +119,46 @@ def main():
             
         except Exception as e:
             st.write(str(e))
+            
+
+    st.subheader("Chat with me")
+
+    # Set OpenAI API key from Streamlit secrets
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+    # Set a default model
+    if "openai_model" not in st.session_state:
+        st.session_state["openai_model"] = "gpt-3.5-turbo"
+
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # Accept user input
+    if prompt := st.chat_input("What is up?"):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        # Display user message in chat message container
+        with st.chat_message("user"):
+            st.markdown(prompt)
+            
+        # Display assistant response in chat message container
+        with st.chat_message("assistant"):
+            stream = client.chat.completions.create(
+                model=st.session_state["openai_model"],
+                messages=[
+                    {"role": m["role"], "content": m["content"]}
+                    for m in st.session_state.messages
+                ],
+                stream=True,
+            )
+            response = st.write_stream(stream)
+        st.session_state.messages.append({"role": "assistant", "content": response})
     
 
 
