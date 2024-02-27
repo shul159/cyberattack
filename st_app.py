@@ -34,9 +34,9 @@ def main():
             
             X = pd.read_csv(file, low_memory=False, dtype=data_type)
             st.subheader('Data')
-            st.write(X.head())
             with st.chat_message("assistant"):
                 st.write('Let us take a look of the data')
+            st.write(X.head())
         except Exception as e:
             st.write(str(e))
 
