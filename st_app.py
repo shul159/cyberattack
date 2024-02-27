@@ -7,7 +7,7 @@ import dill
 import streamlit as st
 from  helper import plot_confusion_matrix,plot_confusion_matrix,plot_precision_recall_curve,compute_metrics, data_type
 
-trained_model = dill.load(open(r'C:/Users/liush/Downloads/model.dill', 'rb'))
+trained_model = dill.load(open('model.dill', 'rb'))
 
 # @st.cache_data(experimental_allow_widgets=True) 
 def main():
