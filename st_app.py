@@ -9,7 +9,7 @@ from  helper import data_type
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-trained_model = dill.load(open('rf_model.dill', 'rb'))
+trained_model = dill.load(open('dt_model.dill', 'rb'))
 
 # @st.cache_data(experimental_allow_widgets=True) 
 def main():
