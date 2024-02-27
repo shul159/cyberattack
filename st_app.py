@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from openai import OpenAI
 
-trained_model = dill.load(open('dt_model.dill', 'rb'))
+trained_model = dill.load(open(r'C:/Users/liush/Downloads/rf_model.dill', 'rb'))
 
 # @st.cache_data(experimental_allow_widgets=True) 
 def main():
@@ -34,9 +34,9 @@ def main():
             
             X = pd.read_csv(file, low_memory=False, dtype=data_type)
             st.subheader('Data')
+            st.write(X.head())
             with st.chat_message("assistant"):
                 st.write('Let us take a look of the data')
-            st.write(X.head())
         except Exception as e:
             st.write(str(e))
 
@@ -79,6 +79,12 @@ def main():
                 st.write('Start predicting')
             predictions = trained_model.predict(X)
             
+            prediction_df = pd.DataFrame({'Attack_type': predictions})
+            df_transposed = prediction_df.T
+            with st.chat_message("assistant"): 
+                st.write('Prediction results')
+            st.write(df_transposed)
+            
             with st.chat_message("assistant"): 
                 st.write('Normal vs. Attack')
             normal_count = (predictions == 'Normal').sum()
@@ -105,7 +111,7 @@ def main():
                     st.write('Danger! Your network is under cyberattack!')
                                     
                 st.write('Here is somethings you can do. You can also ask me for help!')
-                st.markdown(f"[{'Cyberattack'}]({'https://en.wikipedia.org/wiki/Cyberattackt'})", unsafe_allow_html=True)
+                st.markdown(f"[{'Cyberattack'}]({'https://en.wikipedia.org/wiki/Cyberattack'})", unsafe_allow_html=True)
                 st.markdown(f"[{'Denial-of-service attack'}]({'https://en.wikipedia.org/wiki/Denial-of-service_attack'})", unsafe_allow_html=True)
                 st.markdown(f"[{'Man-in-the-middle attack'}]({'https://en.wikipedia.org/wiki/Man-in-the-middle_attack'})", unsafe_allow_html=True)
                 st.markdown(f"[{'Code injection'}]({'https://en.wikipedia.org/wiki/Code_injection'})", unsafe_allow_html=True)
