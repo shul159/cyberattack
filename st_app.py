@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from openai import OpenAI
 
-trained_model = dill.load(open(r'C:/Users/liush/Downloads/rf_model.dill', 'rb'))
+trained_model = dill.load(open('rf_model.dill', 'rb'))
 
 # @st.cache_data(experimental_allow_widgets=True) 
 def main():
