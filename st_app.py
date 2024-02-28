@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from openai import OpenAI
 
-trained_model = dill.load(open('dt_model.dill', 'rb'))
+trained_model = dill.load(open(r'C:/Users/liush/Downloads/rf_model.dill', 'rb'))
 
 # @st.cache_data(experimental_allow_widgets=True) 
 def main():
@@ -34,9 +34,9 @@ def main():
             
             X = pd.read_csv(file, low_memory=False, dtype=data_type)
             st.subheader('Data')
-            st.write(X.head())
             with st.chat_message("assistant"):
                 st.write('Let us take a look of the data')
+            st.write(X.head())
         except Exception as e:
             st.write(str(e))
 
@@ -100,6 +100,13 @@ def main():
             ax2 = pd.DataFrame({'Attack_type':predictions}).Attack_type.value_counts().sort_values(ascending=True).plot(kind='barh')
             fig2 = ax2.figure
             st.pyplot(fig2)
+            plt.clf()
+            
+            with st.chat_message("assistant"): 
+                st.write('Attack Types Percentage')
+            ax3 = pd.DataFrame({'Attack_type':predictions}).Attack_type.value_counts().sort_values(ascending=True).plot(kind='pie', autopct='%.2f%%')
+            fig3 = ax3.figure
+            st.pyplot(fig3)
             plt.clf()
             
                         
