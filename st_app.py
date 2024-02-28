@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from openai import OpenAI
 
-trained_model = dill.load(open('dt_model.dill', 'rb'))
+trained_model = dill.load(open(r'C:/Users/liush/Downloads/rf_model.dill', 'rb'))
 
 # @st.cache_data(experimental_allow_widgets=True) 
 def main():
@@ -33,6 +33,13 @@ def main():
             ## read the uploaded csv file
             
             X = pd.read_csv(file, low_memory=False, dtype=data_type)
+            selected_features = ['icmp.checksum', 'icmp.seq_le', 'http.content_length', 'http.request.method', 'http.referer',
+                                 'http.request.version', 'http.response', 'tcp.ack', 'tcp.ack_raw', 'tcp.checksum', 'tcp.len', 'tcp.seq',
+                                 'tcp.connection.fin', 'tcp.connection.rst', 'tcp.connection.syn', 'tcp.connection.synack', 'tcp.flags', 'tcp.flags.ack',
+                                 'udp.stream', 'udp.time_delta', 'dns.qry.name', 'dns.qry.name.len', 'dns.qry.qu', 'dns.retransmission', 'dns.retransmit_request',
+                                 'mqtt.conack.flags', 'mqtt.conflag.cleansess', 'mqtt.conflags', 'mqtt.hdrflags', 'mqtt.len',
+                                 'mqtt.msgtype', 'mqtt.proto_len', 'mqtt.protoname', 'mqtt.topic', 'mqtt.topic_len', 'mqtt.ver']
+            X = X[selected_features]
             st.subheader('Data')
             with st.chat_message("assistant"):
                 st.write('Let us take a look of the data')
